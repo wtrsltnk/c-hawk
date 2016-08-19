@@ -1,4 +1,4 @@
 bin/
 obj/
-tcc_config.bat
+tcc-config.bat
 scintilla/*

@@ -5,10 +5,10 @@ rem set LOCAL_PATH=%~dp0tcc\bin;%PATH%
 
 echo Looking for tcc.exe in PATH...
 
-if not exist tcc_config.bat (
+if not exist tcc-config.bat (
     goto :find_tcc
 ) else (
-    call tcc_config.bat
+    call tcc-config.bat
     if not defined TCC (
         goto :find_tcc
     )
@@ -35,20 +35,20 @@ goto :notfound
 
 :found
 cd %~dp0
-echo echo Found tcc.exe>tcc_config.bat
-echo set TCC=%TCC%>>tcc_config.bat
-echo set TCC_ROOT=%TCC_ROOT%>>tcc_config.bat
-echo set TCC_BIN=%TCC_BIN%>>tcc_config.bat
-echo set TCC_INCLUDE=%TCC_ROOT%\include>>tcc_config.bat
-echo set TCC_LIB=%TCC_ROOT%\lib>>tcc_config.bat
+echo echo Found tcc.exe>tcc-config.bat
+echo set TCC=%TCC%>>tcc-config.bat
+echo set TCC_ROOT=%TCC_ROOT%>>tcc-config.bat
+echo set TCC_BIN=%TCC_BIN%>>tcc-config.bat
+echo set TCC_INCLUDE=%TCC_ROOT%\include>>tcc-config.bat
+echo set TCC_LIB=%TCC_ROOT%\lib>>tcc-config.bat
 goto :call_config
 
 :notfound
-echo echo Unable to find tcc.exe>tcc_config.bat
+echo echo Unable to find tcc.exe>tcc-config.bat
 goto :call_config
 
 :call_config
-call tcc_config.bat
+call tcc-config.bat
 goto :exit
 
 :exit
