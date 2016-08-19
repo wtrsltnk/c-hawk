@@ -1,0 +1,4 @@
+bin/
+obj/
+tcc_config.bat
+scintilla/*
