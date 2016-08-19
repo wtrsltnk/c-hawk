@@ -1,5 +1,6 @@
 
 #include <windows.h>
+#include <stdio.h>
 
 #include "editor.h"
 
@@ -102,6 +103,8 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLi
 
     MSG msg;
     msg.wParam = 0;
+    
+    printf("test bericht\n");
 
     int running = 1;
     while (running > 0)
