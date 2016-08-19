@@ -1,0 +1,2 @@
+mainwindow.c
+editor.c
