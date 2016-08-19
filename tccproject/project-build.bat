@@ -61,7 +61,6 @@ if exist %PROJECT_ROOT%\project-binaries.txt (
 )
 
 echo @echo Done building %PROJECT_NAME%>>%PROJECT_ROOT%\tccproject\temp_build.bat
-echo @echo.>>%PROJECT_ROOT%\tccproject\temp_build.bat
 echo @goto :exit>>%PROJECT_ROOT%\tccproject\temp_build.bat
 echo :errorHandling>>%PROJECT_ROOT%\tccproject\temp_build.bat
 echo @echo.>>%PROJECT_ROOT%\tccproject\temp_build.bat

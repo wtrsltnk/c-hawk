@@ -38,6 +38,7 @@ goto :notfound
 
 :found
 echo found it!
+cd %~dp0
 echo set TCC=%TCC%>tcc-config.bat
 echo set TCC_ROOT=%TCC_ROOT%>>tcc-config.bat
 echo set TCC_BIN=%TCC_BIN%>>tcc-config.bat

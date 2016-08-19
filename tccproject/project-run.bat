@@ -9,7 +9,7 @@ for %%i in ("%~dp0..") do (
 )
 
 set BIN_DIR=%PROJECT_ROOT%\tccproject\bin
-if not exist %BIN_DIR% goto :no_binary_found
+if not exist %BIN_DIR%\%PROJECT_NAME%.exe goto :no_binary_found
 
 call %BIN_DIR%\%PROJECT_NAME%.exe
 goto :exit 
