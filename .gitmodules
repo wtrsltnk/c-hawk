@@ -1,0 +1,3 @@
+[submodule "tcc-project"]
+	path = tcc-project
+	url = https://github.com/wtrsltnk/tcc-project.git
