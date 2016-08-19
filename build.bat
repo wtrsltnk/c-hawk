@@ -10,14 +10,7 @@ if not exist %OBJ_DIR% mkdir %OBJ_DIR%
 set BIN_DIR=bin
 if not exist %BIN_DIR% mkdir %BIN_DIR%
 
-if not exist tcc_config.bat (
-    call find_tcc.bat
-)
-
-if not exist tcc_config.bat goto :tcc_not_found
-
-call tcc_config.bat
-
+call find_tcc.bat
 if not defined TCC goto :tcc_not_found
 
 echo Building %PROJECT_NAME% with %TCC%
