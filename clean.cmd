@@ -1,1 +1,1 @@
-@call tccproject\project-clean.bat
+@call tcc-project\project-clean.bat
