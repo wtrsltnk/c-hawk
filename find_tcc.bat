@@ -31,7 +31,6 @@ for %%A in ("%LOCAL_PATH:;=";"%") do (
         popd
     )
 )
-
 goto :notfound
 
 :found
@@ -42,13 +41,14 @@ echo set TCC_ROOT=%TCC_ROOT%>>tcc_config.bat
 echo set TCC_BIN=%TCC_BIN%>>tcc_config.bat
 echo set TCC_INCLUDE=%TCC_ROOT%\include>>tcc_config.bat
 echo set TCC_LIB=%TCC_ROOT%\lib>>tcc_config.bat
-
-goto :exit
+goto :call_config
 
 :notfound
 echo echo Unable to find tcc.exe>tcc_config.bat
+goto :call_config
 
+:call_config
+call tcc_config.bat
 goto :exit
 
 :exit
-call tcc_config.bat
