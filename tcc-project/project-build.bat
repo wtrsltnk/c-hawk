@@ -53,10 +53,10 @@ for /f "tokens=*" %%a in (%PROJECT_ROOT%\project-files.txt) do (
 echo.>>%PROJECT_ROOT%\tccproject\temp_build.bat
 echo @echo.>>%PROJECT_ROOT%\tccproject\temp_build.bat
 
-@rem When there are binaries configfured, copy these to the bin folder
-if exist %PROJECT_ROOT%\project-binaries.txt (
-    for /f "tokens=*" %%a in (%PROJECT_ROOT%\project-binaries.txt) do (
-        echo copy %%~a %BIN_DIR%>>%PROJECT_ROOT%\tccproject\temp_build.bat
+@rem When there are install files configfured, copy these to the bin folder
+if exist %PROJECT_ROOT%\project-install-files.txt (
+    for /f "tokens=*" %%a in (%PROJECT_ROOT%\project-install-files.txt) do (
+        echo copy %PROJECT_ROOT%\%%~a %BIN_DIR%>>%PROJECT_ROOT%\tccproject\temp_build.bat
     )
 )
 

@@ -5,8 +5,6 @@ rem set LOCAL_PATH=%~dp0tcc\bin;%PATH%
 
 cd %~dp0
 
-echo | set /p dummy=Looking for tcc.exe in PATH...
-
 if not exist tcc-config.bat (
     goto :find_tcc
 ) else (
@@ -14,17 +12,20 @@ if not exist tcc-config.bat (
     if not defined TCC (
         goto :find_tcc
     )
-    echo found it!
     goto :exit
 )
 
 :find_tcc
+
+echo | set /p dummy=Looking for tcc.exe in PATH...
+
 for %%A in ("%LOCAL_PATH:;=";"%") do (
     if exist %%A (
         set f="%%~A"
         pushd %%A
         for /r %f% %%G in (*.exe) do (
-            if "%%~nxG"=="tcc.exe" (
+            if "%%~nxG"=="tcc.exes" (
+                echo found it!
                 set TCC=%%~dpnxG
                 set TCC_BIN=%%~dpG
                 for %%i in ("%TCC_BIN%..") do set "TCC_ROOT=%%~fi"
@@ -34,10 +35,10 @@ for %%A in ("%LOCAL_PATH:;=";"%") do (
         popd
     )
 )
+echo didn't find it:(
 goto :notfound
 
 :found
-echo found it!
 cd %~dp0
 echo set TCC=%TCC%>tcc-config.bat
 echo set TCC_ROOT=%TCC_ROOT%>>tcc-config.bat
@@ -47,11 +48,14 @@ echo set TCC_LIB=%TCC_ROOT%\lib>>tcc-config.bat
 goto :call_config
 
 :notfound
-echo didn't find it:(
-echo @echo Unable to find tcc.exe>tcc-config.bat
+cd %~dp0
+echo @echo.>tcc-config.bat
+echo @echo No tcc.exe available to build your project with>tcc-config.bat
+echo @echo.>tcc-config.bat
 goto :call_config
 
 :call_config
+cd %~dp0
 call tcc-config.bat
 goto :exit
 
