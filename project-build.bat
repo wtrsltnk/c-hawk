@@ -18,14 +18,14 @@ if not defined TCC goto :tcc_not_found
 
 echo Building %PROJECT_NAME% with %TCC%
 
-if not exist project-includes.txt echo Replace this line with one or more directories to include in you project>project-includes.txt
+if not exist project-includes.txt echo Replace this text with one directory per line to include in you project>project-includes.txt
 
 set INCLUDES=-I%TCC_INCLUDE%
 for /f "tokens=*" %%a in (project-includes.txt) do (
   set INCLUDES=!INCLUDES! -I%%~a
 )
 
-if not exist project-files.txt echo Replace this line with one or more source files to include in you project>project-files.txt
+if not exist project-files.txt echo Replace this text with one source file per line to include in you project>project-files.txt
 
 for /f "tokens=*" %%a in (project-files.txt) do (
     echo %TCC% -c -o %OBJ_DIR%\%%~na.o %%~a %INCLUDES%>>temp_build.bat
@@ -36,10 +36,14 @@ for /f "tokens=*" %%a in (project-files.txt) do (
     echo|set /p=%OBJ_DIR%\%%~na.o>>temp_build.bat
 )
 
+if exist project-binaries.txt (
+    for /f "tokens=*" %%a in (project-binaries.txt) do (
+        echo copy %%~a %BIN_DIR%>>temp_build.bat
+    )
+)
+
 call temp_build.bat
 del temp_build.bat
-
-copy *.dll %BIN_DIR%\
 
 echo Done building %PROJECT_NAME%
 pause
