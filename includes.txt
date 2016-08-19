@@ -1,1 +1,2 @@
-scintilla\include
+scintilla/include
+src

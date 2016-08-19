@@ -1,4 +1,5 @@
 @echo off
+setlocal EnableDelayedExpansion
 
 for %%i in ("%~dp0.") do set "PROJECT_NAME=%%~ni"
 
@@ -23,11 +24,11 @@ echo Building %PROJECT_NAME% with %TCC%
 
 set INCLUDES=-I%TCC_INCLUDE%
 for /f "tokens=*" %%a in (includes.txt) do (
-  set INCLUDES=%INCLUDES% -I%%~a
+  set INCLUDES=!INCLUDES! -I%%~a
 )
 
 for /f "tokens=*" %%a in (files.txt) do (
-    echo %TCC% -c -o %OBJ_DIR%\%%~na.o %%~nxa %INCLUDES%>>temp_build.bat
+    echo %TCC% -c -o %OBJ_DIR%\%%~na.o %%~a %INCLUDES%>>temp_build.bat
 )
 
 echo|set /p=%TCC% -o %BIN_DIR%\%PROJECT_NAME%.exe>>temp_build.bat

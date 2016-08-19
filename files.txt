@@ -1,2 +1,2 @@
-mainwindow.c
-editor.c
+src/mainwindow.c
+src/editor.c
