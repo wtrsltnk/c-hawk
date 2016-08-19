@@ -3,6 +3,8 @@
 set LOCAL_PATH=%PATH%
 rem set LOCAL_PATH=%~dp0tcc\bin;%PATH%
 
+cd %~dp0
+
 echo | set /p dummy=Looking for tcc.exe in PATH...
 
 if not exist tcc-config.bat (
@@ -36,7 +38,6 @@ goto :notfound
 
 :found
 echo found it!
-cd %~dp0
 echo set TCC=%TCC%>tcc-config.bat
 echo set TCC_ROOT=%TCC_ROOT%>>tcc-config.bat
 echo set TCC_BIN=%TCC_BIN%>>tcc-config.bat
