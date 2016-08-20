@@ -1,0 +1,3 @@
+user32
+kernel32
+gdi32

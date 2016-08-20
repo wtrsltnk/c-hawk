@@ -10,6 +10,9 @@ static HWND currentDialog;
 
 static const char className[] = "C-HawkMainWindow";
 
-LRESULT DisplayMyMessage(HINSTANCE hinst, HWND hwndOwner, LPSTR lpszMessage);
+static int cmdShow = 0;
+static LPCSTR projectRoot = NULL;
+
+LPCSTR DisplayMyMessage(HINSTANCE hinst, HWND hwndOwner, LPSTR lpszMessage);
 
 #endif // _C_HAWK_H_

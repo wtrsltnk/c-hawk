@@ -68,7 +68,7 @@ LPWORD lpwAlign(LPWORD lpIn)
     return (LPWORD)ul;
 }
 
-LRESULT DisplayMyMessage(HINSTANCE hinst, HWND hwndOwner, LPSTR lpszMessage)
+LPCSTR DisplayMyMessage(HINSTANCE hinst, HWND hwndOwner, LPSTR lpszMessage)
 {
     HGLOBAL hgbl;
     LPDLGTEMPLATE lpdt;
@@ -180,5 +180,9 @@ LRESULT DisplayMyMessage(HINSTANCE hinst, HWND hwndOwner, LPSTR lpszMessage)
                            hwndOwner, 
                            (DLGPROC)DialogProc); 
     GlobalFree(hgbl); 
-    return ret; 
+    if (ret == TRUE)
+    {
+        return pszCurDir;
+    }
+    return NULL; 
 }

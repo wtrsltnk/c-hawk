@@ -73,6 +73,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
         SendMessage(wIncludesLabel, WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
         SendMessage(wIncludesList, WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
 
+        if (projectRoot != NULL)
+        {
+            ShowWindow(wMain, cmdShow);
+        }
+        else
+        {
+            LPCSTR folder = DisplayMyMessage(hInstance, wMain, "Todo: Select a project folder" );
+            if (folder == NULL)
+            {
+                PostQuitMessage(0);
+            }
+            else
+            {
+                projectRoot = folder;
+                ShowWindow(wMain, cmdShow);
+            }
+        }
         return 0;
     }
 
@@ -173,9 +190,10 @@ static void RegisterWindowClass()
         exit(FALSE);
 }
 
-int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow)
+int main(int argc, char* argv)
 {
-    hInstance = hInstance;
+    hInstance = GetModuleHandle(NULL);
+    cmdShow = SW_SHOW;
 
     HACCEL hAccTable = LoadAccelerators(hInstance, "notepad3");
 
@@ -197,13 +215,9 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLi
                  hInstance,
                  0);
 
-    ShowWindow(wMain, nCmdShow);
-
     MSG msg;
     msg.wParam = 0;
     
-    printf("test bericht\n");
-
     int running = 1;
     while (running > 0)
     {
