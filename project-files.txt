@@ -1,2 +1,3 @@
 src/mainwindow.c
 src/editor.c
+src/dialog.newproject.c

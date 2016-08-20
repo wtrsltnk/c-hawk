@@ -1,14 +1,6 @@
-
-#include <windows.h>
-#include <stdio.h>
-
+#include "c-hawk.h"
 #include "editor.h"
-
-static HINSTANCE hInstance;
-static HWND wMain;
-static HWND currentDialog;
-
-static const char className[] = "Notepad3Window";
+#include "resource.h"
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
@@ -16,7 +8,70 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
     {
+        HMENU hMenu, hSubMenu;
+
+        hMenu = CreateMenu();
+
+        hSubMenu = CreatePopupMenu();
+        AppendMenu(hSubMenu, MF_STRING, IDM_FILE_NEW, "&New");
+        AppendMenu(hSubMenu, MF_STRING, IDM_FILE_OPEN, "&Open");
+        AppendMenu(hSubMenu, MF_SEPARATOR, 0, 0);
+        AppendMenu(hSubMenu, MF_STRING, IDM_FILE_EXIT, "E&xit");
+        AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&File");
+
+        hSubMenu = CreatePopupMenu();
+        AppendMenu(hSubMenu, MF_STRING, IDM_PROJECT_NEW, "&New project");
+        AppendMenu(hSubMenu, MF_SEPARATOR, 0, 0);
+        AppendMenu(hSubMenu, MF_STRING, IDM_FILE_NEW, "&Add new file");
+        AppendMenu(hSubMenu, MF_STRING, IDM_PROJECT_ADD_INCLUDE, "&Add include directory");
+        AppendMenu(hSubMenu, MF_SEPARATOR, 0, 0);
+        AppendMenu(hSubMenu, MF_STRING, IDM_PROJECT_BUILD, "&Build");
+        AppendMenu(hSubMenu, MF_STRING, IDM_PROJECT_REBUILD, "Rebuild");
+        AppendMenu(hSubMenu, MF_STRING, IDM_PROJECT_CLEAN, "Clean");
+        AppendMenu(hSubMenu, MF_STRING, IDM_PROJECT_RUN, "&Run");
+        AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Project");
+
+        SetMenu(hWnd, hMenu);
+        
         createEditor(hInstance, hWnd);
+        
+        wFilesLabel = CreateWindowExW(0
+            , L"STATIC", L""
+            , WS_CHILD | WS_VISIBLE | SS_CENTER
+            , 7, 7, 50, 21
+            , hWnd, NULL, hInstance, NULL);
+        SendMessage(wFilesLabel, WM_SETTEXT, 0, (LPARAM)"FILES");
+
+        wFilesList = CreateWindowExW(WS_EX_STATICEDGE
+            , L"LISTBOX", L""
+            , WS_CHILD | WS_VISIBLE | WS_VSCROLL
+            , 0, 35, 200, 200
+            , hWnd, NULL, hInstance, NULL);
+            
+        wIncludesLabel = CreateWindowExW(0
+            , L"STATIC", L""
+            , WS_CHILD | WS_VISIBLE | SS_CENTER
+            , 7, 7, 50, 21
+            , hWnd, NULL, hInstance, NULL);
+        SendMessage(wIncludesLabel, WM_SETTEXT, 0, (LPARAM)"INCLUDES");
+
+        wIncludesList = CreateWindowExW(WS_EX_STATICEDGE
+            , L"LISTBOX", L""
+            , WS_CHILD | WS_VISIBLE | WS_VSCROLL
+            , 0, 35, 200, 200
+            , hWnd, NULL, hInstance, NULL);
+
+        HFONT font = CreateFont(16, 0, 0, 0,
+                                FW_NORMAL, FALSE, FALSE, FALSE,
+                                ANSI_CHARSET, OUT_DEFAULT_PRECIS,
+                                CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+                                DEFAULT_PITCH,
+                                NULL);
+
+        SendMessage(wFilesLabel, WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
+        SendMessage(wFilesList, WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
+        SendMessage(wIncludesLabel, WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
+        SendMessage(wIncludesList, WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
 
         return 0;
     }
@@ -26,18 +81,61 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
         {
             RECT rc;
             GetClientRect(hWnd, &rc);
-            resizeEditor(rc.left + 200, rc.top, rc.right - rc.left - 200, rc.bottom - rc.top);
+            resizeEditor(rc.left+200, rc.top, rc.right - rc.left - 200, rc.bottom - rc.top);
+            SetWindowPos(wFilesLabel, 0, rc.left, rc.top, rc.left + 200, 20, 0);
+            SetWindowPos(wFilesList, 0, rc.left, rc.top + 20, rc.left + 200, rc.bottom - rc.top - (300 + 20), 0);
+            SetWindowPos(wIncludesLabel, 0, rc.left, rc.bottom - 300, rc.left + 200, 20, 0);
+            SetWindowPos(wIncludesList, 0, rc.left, rc.bottom - 280, rc.left + 200, (300 - 20), 0);
         }
         return 0;
 
     case WM_COMMAND:
-//        app.Command(LOWORD(wParam));
+    {
+        switch (LOWORD(wParam)) {
+        case IDM_FILE_NEW:
+            SendMessage(wFilesList, LB_ADDSTRING, 0, (LPARAM)"test1");
+            break;
+        case IDM_FILE_OPEN:
+            break;
+        case IDM_FILE_SAVE:
+            break;
+        case IDM_FILE_SAVEAS:
+            break;
+        case IDM_FILE_EXIT:
+            PostQuitMessage(0);
+            break;
+        case IDM_PROJECT_ADD_INCLUDE:
+            SendMessage(wIncludesList, LB_ADDSTRING, 0, (LPARAM)"scintilla/include");
+            break;
+        case IDM_PROJECT_NEW:
+            DisplayMyMessage(hInstance, wMain, "Todo: Select a project folder" );
+            break;
+
+        case IDM_EDIT_UNDO:
+            editorUndo();
+            break;
+        case IDM_EDIT_REDO:
+            editorRedo();
+            break;
+        case IDM_EDIT_CUT:
+             editorCut();
+            break;
+        case IDM_EDIT_COPY:
+            editorCopy();
+            break;
+        case IDM_EDIT_PASTE:
+            editorPaste();
+            break;
+        case IDM_EDIT_DELETE:
+            editorDelete();
+            break;
+        case IDM_EDIT_SELECTALL:
+            editorSelectAll();
+            break;
+        };
 //        app.CheckMenus();
         return 0;
-
-    case WM_NOTIFY:
-//        app.Notify(reinterpret_cast<SCNotification *>(lParam));
-        return 0;
+    }
 
     case WM_MENUSELECT:
 //        app.CheckMenus();

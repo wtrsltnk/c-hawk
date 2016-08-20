@@ -2,7 +2,13 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
+#include <stdio.h>
+
+const int blockSize = 128 * 1024;
+
 HWND wEditor;
+BOOL isDirty;
+char fullPath[MAX_PATH];
 
 void InitialiseEditor();
 
@@ -237,4 +243,39 @@ void destroyEditor()
 void resizeEditor(int x, int y, int w, int h)
 {
     SetWindowPos(wEditor, 0, x, y, w, h, 0);
+}
+
+void editorUndo()
+{
+    SendEditor(WM_UNDO, 0, 0);
+}
+
+void editorRedo()
+{
+    SendEditor(SCI_REDO, 0, 0);
+}
+
+void editorCut()
+{
+    SendEditor(WM_CUT, 0, 0);
+}
+
+void editorCopy()
+{
+    SendEditor(WM_COPY, 0, 0);
+}
+
+void editorPaste()
+{
+    SendEditor(WM_PASTE, 0, 0);
+}
+
+void editorDelete()
+{
+    SendEditor(WM_CLEAR, 0, 0);
+}
+
+void editorSelectAll()
+{
+    SendEditor(SCI_SELECTALL, 0, 0);
 }
