@@ -3,6 +3,7 @@
 
 PTSTR pszCurDir; 
 TCHAR achBuffer[MAX_PATH]; 
+TCHAR currentPath[MAX_PATH]; 
 
 INT_PTR CALLBACK DialogProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -12,8 +13,9 @@ INT_PTR CALLBACK DialogProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             // Initialize the list box by filling it with files from 
             // the current directory. 
-            pszCurDir = achBuffer; 
-            GetCurrentDirectory(MAX_PATH, pszCurDir); 
+            pszCurDir = achBuffer;
+            GetCurrentDirectory(MAX_PATH, pszCurDir);
+            strcpy(currentPath, pszCurDir);
             DlgDirList(hWnd, pszCurDir, IDC_FILELIST, ID_TEXT, DDL_DIRECTORY); 
             SetFocus(GetDlgItem(hWnd, IDC_FILELIST)); 
             break;
@@ -42,10 +44,30 @@ INT_PTR CALLBACK DialogProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
                                 // Get item data.
                                 char lpszBuffer[MAX_PATH];
-                                int i = (int)SendMessage(hwndList, LB_GETTEXT, lbItem, lpszBuffer);
-
-                                SetDlgItemText(hWnd, ID_TEXT, lpszBuffer); 
+                                char lpszBuffer2[MAX_PATH];
+                                DlgDirSelectEx(hWnd, lpszBuffer, MAX_PATH, IDC_FILELIST);
+                                strcpy(lpszBuffer2, currentPath);
+                                strcat(lpszBuffer2, "\\");
+                                strcat(lpszBuffer2, lpszBuffer);
+                                SetDlgItemText(hWnd, ID_TEXT, lpszBuffer2); 
                                 return TRUE; 
+                            }
+                        case LBN_DBLCLK:
+                            {
+                                HWND hwndList = GetDlgItem(hWnd, IDC_FILELIST); 
+
+                                // Get selected index.
+                                int lbItem = (int)SendMessage(hwndList, LB_GETCURSEL, 0, 0);  
+
+                                // Get item data.
+                                char lpszBuffer[MAX_PATH];
+                                char lpszBuffer2[MAX_PATH];
+                                DlgDirSelectEx(hWnd, lpszBuffer, MAX_PATH, IDC_FILELIST);
+                                strcpy(lpszBuffer2, currentPath);
+                                strcat(lpszBuffer2, "\\");
+                                strcat(lpszBuffer2, lpszBuffer);
+                                strcpy(currentPath, lpszBuffer2);
+                                DlgDirList(hWnd, lpszBuffer2, IDC_FILELIST, ID_TEXT, DDL_DIRECTORY); 
                             }
                         }
                         return TRUE;
@@ -163,7 +185,7 @@ LPCSTR DisplayMyMessage(HINSTANCE hinst, HWND hwndOwner, LPSTR lpszMessage)
     lpdit->x  = 10; lpdit->y  = 30;
     lpdit->cx = 260; lpdit->cy = 140;
     lpdit->id = IDC_FILELIST;    // Help button identifier
-    lpdit->style = WS_CHILD | WS_VISIBLE | LBS_NOTIFY;
+    lpdit->style = WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_NOTIFY;
 
     lpw = (LPWORD)(lpdit + 1);
     *lpw++ = 0xFFFF;
@@ -182,7 +204,7 @@ LPCSTR DisplayMyMessage(HINSTANCE hinst, HWND hwndOwner, LPSTR lpszMessage)
     GlobalFree(hgbl); 
     if (ret == TRUE)
     {
-        return pszCurDir;
+        return currentPath;
     }
     return NULL; 
 }

@@ -73,23 +73,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
         SendMessage(wIncludesLabel, WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
         SendMessage(wIncludesList, WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
 
-        if (projectRoot != NULL)
-        {
-            ShowWindow(wMain, cmdShow);
-        }
-        else
-        {
-            LPCSTR folder = DisplayMyMessage(hInstance, wMain, "Todo: Select a project folder" );
-            if (folder == NULL)
-            {
-                PostQuitMessage(0);
-            }
-            else
-            {
-                projectRoot = folder;
-                ShowWindow(wMain, cmdShow);
-            }
-        }
         return 0;
     }
 
@@ -150,13 +133,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
             editorSelectAll();
             break;
         };
-//        app.CheckMenus();
         return 0;
     }
-
-    case WM_MENUSELECT:
-//        app.CheckMenus();
-        return 0;
 
     case WM_CLOSE:
     {
@@ -190,17 +168,8 @@ static void RegisterWindowClass()
         exit(FALSE);
 }
 
-int main(int argc, char* argv)
+int RunApp()
 {
-    hInstance = GetModuleHandle(NULL);
-    cmdShow = SW_SHOW;
-
-    HACCEL hAccTable = LoadAccelerators(hInstance, "notepad3");
-
-    LoadLibrary("SciLexer.dll");
-
-    RegisterWindowClass();
-
     wMain = CreateWindowEx(
                  WS_EX_CLIENTEDGE,
                  className,
@@ -215,6 +184,8 @@ int main(int argc, char* argv)
                  hInstance,
                  0);
 
+    ShowWindow(wMain, cmdShow);
+    
     MSG msg;
     msg.wParam = 0;
     
@@ -243,6 +214,33 @@ int main(int argc, char* argv)
             }
         }
     }
-
     return msg.wParam;
+}
+
+int main(int argc, char* argv)
+{
+    if (argc > 1) strcpy(projectRoot, argv[1]);
+    
+    hInstance = GetModuleHandle(NULL);
+    cmdShow = SW_SHOW;
+
+    hAccTable = LoadAccelerators(hInstance, "notepad3");
+
+    LoadLibrary("SciLexer.dll");
+
+    RegisterWindowClass();
+
+    if (projectRoot[0] == '\0')
+    {
+        LPCSTR folder = DisplayMyMessage(hInstance, wMain, "Todo: Select a project folder" );
+        if (folder != NULL)
+        {
+            strcpy(projectRoot, folder);
+            return RunApp();
+        }
+        
+        return 0;
+    }
+    
+    return RunApp();
 }

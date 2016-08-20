@@ -6,12 +6,13 @@
 
 static HINSTANCE hInstance;
 static HWND wMain, wFilesLabel, wFilesList, wIncludesLabel, wIncludesList;
+static HACCEL hAccTable;
 static HWND currentDialog;
 
 static const char className[] = "C-HawkMainWindow";
 
 static int cmdShow = 0;
-static LPCSTR projectRoot = NULL;
+static TCHAR projectRoot[MAX_PATH] = { '\0' };
 
 LPCSTR DisplayMyMessage(HINSTANCE hinst, HWND hwndOwner, LPSTR lpszMessage);
 
