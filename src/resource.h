@@ -22,6 +22,8 @@
 #define IDM_PROJECT_RUN                  40104
 #define IDM_PROJECT_NEW                  40105
 #define IDM_PROJECT_ADD_INCLUDE          40106
+#define IDM_HELP_CONTENT                 40201
+#define IDM_HELP_ABOUT                   40202
 
 #define ID_HELP   150
 #define ID_TEXT   200

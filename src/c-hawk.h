@@ -16,6 +16,7 @@ static LPCWSTR panelNames[4] = { L"FILES", L"INCLUDES", L"LIBS", L"LIB DIRECTORI
 static HACCEL hAccTable;
 static HWND currentDialog;
 
+static const char appName[] = "C-Hawk";
 static const char className[] = "C-HawkMainWindow";
 
 static int cmdShow = 0;

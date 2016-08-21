@@ -18,6 +18,10 @@ void FillListWithLinesFromFile(const char* filename, HWND hWnd)
 
 void SetupProject()
 {
+    char buffer[MAX_PATH+MAX_PATH] = "";
+    strcat(buffer, appName); strcat(buffer, " - "); strcat(buffer, projectRoot);
+    SendMessage(wMain, WM_SETTEXT, (WPARAM)0, (LPARAM)buffer);
+    
     char projectFiles[MAX_PATH] = { 0 };
     strcpy(projectFiles, projectRoot);
     strcat(projectFiles, "\\project-files.txt");
@@ -88,6 +92,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
         AppendMenu(hSubMenu, MF_STRING, IDM_PROJECT_RUN, "&Run");
         AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Project");
 
+        hSubMenu = CreatePopupMenu();
+        AppendMenu(hSubMenu, MF_STRING, IDM_HELP_CONTENT, "Help &Content");
+        AppendMenu(hSubMenu, MF_STRING, IDM_HELP_ABOUT, "&About");
+        AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Help");
+
         SetMenu(hWnd, hMenu);
         
         createEditor(hInstance, hWnd);
@@ -110,7 +119,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 
             panelLists[i] = CreateWindowExW(WS_EX_STATICEDGE
                 , L"LISTBOX", L""
-                , WS_CHILD | WS_VISIBLE | WS_VSCROLL
+                , WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_NOTIFY
                 , 0, 0, 200, 200
                 , hWnd, NULL, hInstance, NULL);
             SendMessage(panelLists[i], WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
@@ -123,8 +132,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
             SendMessage(panelButtons[i], WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
         }
         
-        SetupProject();
-
         return 0;
     }
 
@@ -249,6 +256,8 @@ int RunApp()
 
     ShowWindow(wMain, cmdShow);
     
+    SetupProject();
+
     MSG msg;
     msg.wParam = 0;
     
