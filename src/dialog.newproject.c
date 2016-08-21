@@ -102,7 +102,7 @@ LPCSTR DisplayMyMessage(HINSTANCE hinst, HWND hwndOwner, LPSTR lpszMessage)
 
     hgbl = GlobalAlloc(GMEM_ZEROINIT, 2048);
     if (!hgbl)
-        return -1;
+        return NULL;
  
     lpdt = (LPDLGTEMPLATE)GlobalLock(hgbl);
  

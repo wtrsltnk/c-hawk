@@ -2,6 +2,63 @@
 #include "editor.h"
 #include "resource.h"
 
+void FillListWithLinesFromFile(const char* filename, HWND hWnd)
+{
+    FILE* file = fopen(filename, "r");
+    if (file != NULL)
+    {
+        char line[MAX_PATH] = { 0 };
+        while (fgets(line, MAX_PATH, file))
+        {
+            SendMessage(hWnd, LB_ADDSTRING, 0, (LPARAM)line);
+        }
+        fclose(file);
+    }
+}
+
+void SetupProject()
+{
+    char projectFiles[MAX_PATH] = { 0 };
+    strcpy(projectFiles, projectRoot);
+    strcat(projectFiles, "\\project-files.txt");
+    FillListWithLinesFromFile(projectFiles, panelLists[0]);
+    
+    char projectIncludes[MAX_PATH] = { 0 };
+    strcpy(projectIncludes, projectRoot);
+    strcat(projectIncludes, "\\project-includes.txt");
+    FillListWithLinesFromFile(projectIncludes, panelLists[1]);
+    
+    char projectLibs[MAX_PATH] = { 0 };
+    strcpy(projectLibs, projectRoot);
+    strcat(projectLibs, "\\project-libs.txt");
+    FillListWithLinesFromFile(projectLibs, panelLists[2]);
+}
+
+void resizeProjectPanels(RECT rc)
+{
+    int openPanelCount = 0;
+    for (int i = 0; i < 4; i++)
+        if (panelStates[i] == 1) openPanelCount++;
+    int panelHeight = openPanelCount > 0 ? (rc.bottom - rc.top - 80) / openPanelCount : 0;
+
+    int top = rc.top;
+    for (int i = 0; i < 4; i++)
+    {
+        SetWindowPos(panelLabels[i], 0, rc.left + 20, top, 180, 20, 0);
+        SetWindowPos(panelButtons[i], 0, rc.left, top, 20, 20, 0);
+        top += 20;
+        if (panelStates[i] == 1)
+        {
+            SetWindowPos(panelLists[i], 0, rc.left, top, rc.left + 200, panelHeight, 0);
+            top += panelHeight;
+        }
+        else
+        {
+            SetWindowPos(panelLists[i], 0, rc.left, top, 0, 0, 0);
+        }
+    }
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
     switch (iMessage)
@@ -35,65 +92,58 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
         
         createEditor(hInstance, hWnd);
         
-        wFilesLabel = CreateWindowExW(0
-            , L"STATIC", L""
-            , WS_CHILD | WS_VISIBLE | SS_CENTER
-            , 7, 7, 50, 21
-            , hWnd, NULL, hInstance, NULL);
-        SendMessage(wFilesLabel, WM_SETTEXT, 0, (LPARAM)"FILES");
+        HFONT font = CreateFont(16, 0, 0, 0, 
+                                FW_NORMAL, FALSE, FALSE, FALSE, 
+                                ANSI_CHARSET, OUT_DEFAULT_PRECIS, 
+                                CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, 
+                                DEFAULT_PITCH, 
+                                NULL); 
+ 
+        for (int i = 0; i < 4; i++)
+        {
+            panelLabels[i] = CreateWindowExW(0
+                , L"STATIC", panelNames[i]
+                , WS_CHILD | WS_VISIBLE | SS_CENTER
+                , 0, 0, 50, 21
+                , hWnd, NULL, hInstance, NULL);
+            SendMessage(panelLabels[i], WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
 
-        wFilesList = CreateWindowExW(WS_EX_STATICEDGE
-            , L"LISTBOX", L""
-            , WS_CHILD | WS_VISIBLE | WS_VSCROLL
-            , 0, 35, 200, 200
-            , hWnd, NULL, hInstance, NULL);
-            
-        wIncludesLabel = CreateWindowExW(0
-            , L"STATIC", L""
-            , WS_CHILD | WS_VISIBLE | SS_CENTER
-            , 7, 7, 50, 21
-            , hWnd, NULL, hInstance, NULL);
-        SendMessage(wIncludesLabel, WM_SETTEXT, 0, (LPARAM)"INCLUDES");
+            panelLists[i] = CreateWindowExW(WS_EX_STATICEDGE
+                , L"LISTBOX", L""
+                , WS_CHILD | WS_VISIBLE | WS_VSCROLL
+                , 0, 0, 200, 200
+                , hWnd, NULL, hInstance, NULL);
+            SendMessage(panelLists[i], WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
 
-        wIncludesList = CreateWindowExW(WS_EX_STATICEDGE
-            , L"LISTBOX", L""
-            , WS_CHILD | WS_VISIBLE | WS_VSCROLL
-            , 0, 35, 200, 200
-            , hWnd, NULL, hInstance, NULL);
-
-        HFONT font = CreateFont(16, 0, 0, 0,
-                                FW_NORMAL, FALSE, FALSE, FALSE,
-                                ANSI_CHARSET, OUT_DEFAULT_PRECIS,
-                                CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-                                DEFAULT_PITCH,
-                                NULL);
-
-        SendMessage(wFilesLabel, WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
-        SendMessage(wFilesList, WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
-        SendMessage(wIncludesLabel, WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
-        SendMessage(wIncludesList, WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
+            panelButtons[i] = CreateWindowExW(WS_EX_STATICEDGE
+                , L"BUTTON", panelStates[i] == 0 ? L">": L"v"
+                , WS_CHILD | WS_VISIBLE | BS_FLAT
+                , 0, 0, 20, 20
+                , hWnd, (HMENU)(IDC_PANEL_BUTTONS+i), hInstance, NULL);
+            SendMessage(panelButtons[i], WM_SETFONT, (WPARAM)font, (LPARAM)TRUE);
+        }
+        
+        SetupProject();
 
         return 0;
     }
 
     case WM_SIZE:
+    {
         if (wParam != 1)
         {
             RECT rc;
             GetClientRect(hWnd, &rc);
             resizeEditor(rc.left+200, rc.top, rc.right - rc.left - 200, rc.bottom - rc.top);
-            SetWindowPos(wFilesLabel, 0, rc.left, rc.top, rc.left + 200, 20, 0);
-            SetWindowPos(wFilesList, 0, rc.left, rc.top + 20, rc.left + 200, rc.bottom - rc.top - (300 + 20), 0);
-            SetWindowPos(wIncludesLabel, 0, rc.left, rc.bottom - 300, rc.left + 200, 20, 0);
-            SetWindowPos(wIncludesList, 0, rc.left, rc.bottom - 280, rc.left + 200, (300 - 20), 0);
+            resizeProjectPanels(rc);
         }
         return 0;
+    }
 
     case WM_COMMAND:
     {
         switch (LOWORD(wParam)) {
         case IDM_FILE_NEW:
-            SendMessage(wFilesList, LB_ADDSTRING, 0, (LPARAM)"test1");
             break;
         case IDM_FILE_OPEN:
             break;
@@ -105,7 +155,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
             PostQuitMessage(0);
             break;
         case IDM_PROJECT_ADD_INCLUDE:
-            SendMessage(wIncludesList, LB_ADDSTRING, 0, (LPARAM)"scintilla/include");
             break;
         case IDM_PROJECT_NEW:
             DisplayMyMessage(hInstance, wMain, "Todo: Select a project folder" );
@@ -132,6 +181,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
         case IDM_EDIT_SELECTALL:
             editorSelectAll();
             break;
+        default:
+            {
+                if (LOWORD(wParam) >= IDC_PANEL_BUTTONS 
+                    && LOWORD(wParam) < IDC_PANEL_BUTTONS + 4)
+                {
+                    int index = LOWORD(wParam) - IDC_PANEL_BUTTONS;
+                    panelStates[index] = panelStates[index] == 0 ? 1 : 0;
+                    SendMessage(panelButtons[index], WM_SETTEXT, (WPARAM)0, (LPARAM)(panelStates[index] == 0 ? L">": L"v"));
+                    RECT rc;
+                    GetClientRect(hWnd, &rc);
+                    resizeProjectPanels(rc);
+                }
+                break;
+            }
         };
         return 0;
     }
@@ -160,7 +223,7 @@ static void RegisterWindowClass()
     wndclass.hInstance = hInstance;
     wndclass.hIcon = 0;
     wndclass.hCursor = NULL;
-    wndclass.hbrBackground = NULL;
+    wndclass.hbrBackground = (HBRUSH)COLOR_WINDOW;
     wndclass.lpszMenuName = resourceName;
     wndclass.lpszClassName = className;
 
@@ -219,7 +282,7 @@ int RunApp()
 
 int main(int argc, char* argv)
 {
-    if (argc > 1) strcpy(projectRoot, argv[1]);
+    if (argc > 1) strcpy(projectRoot, (const char*)argv[1]);
     
     hInstance = GetModuleHandle(NULL);
     cmdShow = SW_SHOW;

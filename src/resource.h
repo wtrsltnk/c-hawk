@@ -27,6 +27,7 @@
 #define ID_TEXT   200
 #define IDC_FILELIST 3456
 #define IDS_PATHTOFILL 4567
+#define IDC_PANEL_BUTTONS 11111
 
 // Next default values for new objects
 // 
