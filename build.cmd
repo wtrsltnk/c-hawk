@@ -1,1 +1,1 @@
-@call tcc-project\project-build.bat
+@call tcc-project/project-build.bat 
